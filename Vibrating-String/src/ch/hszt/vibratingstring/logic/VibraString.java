@@ -2,23 +2,30 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package ch.hszt.vibratingstring.logic;
+
+import java.util.Observable;
 
 /**
  *
  * @author pascal
  */
-public class VibraString {
+public class VibraString extends Observable {
+
     private int length;
     private double c;
     private IMathFunction f;
     private IMathFunction g;
 
+    public VibraString() {
+      
+    }
+
     /**
      * @return the length
      */
     public int getLength() {
+
         return length;
     }
 
@@ -71,6 +78,8 @@ public class VibraString {
         this.g = g;
     }
 
-    
-
+//    public void updateGui (){
+//    setChanged();
+//    notifyObservers(testY);
+//    }
 }
