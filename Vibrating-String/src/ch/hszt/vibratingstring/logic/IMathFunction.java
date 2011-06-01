@@ -11,7 +11,8 @@ package ch.hszt.vibratingstring.logic;
  */
 public interface IMathFunction {
 
+    
 
-    public double calc(double x);
+    public double[] calc(double[] x);
 
 }
