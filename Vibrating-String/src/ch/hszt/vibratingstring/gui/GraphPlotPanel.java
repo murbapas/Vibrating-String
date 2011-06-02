@@ -56,7 +56,16 @@ public class GraphPlotPanel extends JPanel {
   /**
    * Creates a new instance of {@code GraphPlotPanel}.
    */
-  public GraphPlotPanel() {
+  public GraphPlotPanel(double[] x, double[] y) {
+
+     double[] xExtremals = getExtremals(x);
+    double[] yExtremals = getExtremals(y);
+
+    this.xMin = xExtremals[0];
+    this.xMax = xExtremals[1];
+    this.yMin = 2 * yExtremals[0];
+    this.yMax = 2 * yExtremals[1];
+
   }
   
   @Override
@@ -125,13 +134,13 @@ public class GraphPlotPanel extends JPanel {
       throw new IllegalArgumentException("x and y must be the same size! x: " + x.length + " y: " + y.length);
     }
     
-    double[] xExtremals = getExtremals(x);
-    double[] yExtremals = getExtremals(y);
+//    double[] xExtremals = getExtremals(x);
+//    double[] yExtremals = getExtremals(y);
 
-    this.xMin = xExtremals[0];
-    this.xMax = xExtremals[1];
-    this.yMin = yExtremals[0];
-    this.yMax = 2 * yExtremals[1];
+//    this.xMin = xExtremals[0];
+//    this.xMax = xExtremals[1];
+//    this.yMin = 2 * yExtremals[0];
+//    this.yMax = 2 * yExtremals[1];
     this.x = x;
     this.y = y;
     

@@ -15,7 +15,8 @@ public class SquareFunction implements IMathFunction{
         double[] y = new double[x.length];
 
          for (int i = 0; i < x.length; i++){
-            y[i] = 6.0d * x[i] - Math.pow(x[i], 2.0d);
+            //y[i] = 6.0d * x[i] - Math.pow(x[i], 2.0d);
+             y[i] = (2 * x[i] - Math.pow(x[i], 2))/ 48;
         }
         return y;
     }

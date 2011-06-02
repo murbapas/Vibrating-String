@@ -34,7 +34,7 @@ public class VibraStringWindow extends JFrame {
     /**
      * The panel with the plotted graph
      */
-    private GraphPlotPanel stringP = new GraphPlotPanel();
+    private GraphPlotPanel stringP;
     /**
      * Screen resolution
      */
@@ -66,6 +66,7 @@ public class VibraStringWindow extends JFrame {
         //vibraString.addObserver(this);
         this.x = x;
         this.y = y;
+        stringP = new GraphPlotPanel(x, y);
         stringP.setValues(x, y);
         configure();
         createGUI();

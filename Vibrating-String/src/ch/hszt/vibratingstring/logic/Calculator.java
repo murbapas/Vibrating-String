@@ -4,7 +4,7 @@
  */
 package ch.hszt.vibratingstring.logic;
 
-import java.util.List;
+import java.util.Arrays;
 
 /**
  *
@@ -18,18 +18,24 @@ public class Calculator implements Runnable {
     private VibraString string;
     private double c;
     private int length;
+    private int l;
 
     public Calculator(double[] x, double[] y, VibraString string) {
         this.y = y;
+        
         this.x = x;
+        
         this.string = string;
         c = string.getC();
         length = string.getLength();
+        l = y.length;
+        
     }
 
     public void run() {
         while (true) {
-            for (double t = 0.0; t < 10.0; t+= 0.001) {
+            //Arrays.fill(y, 0);
+            for (double t = 0; t < 100; t += 0.0001) {
                 try {
                     Thread.sleep(20);
                 } catch (InterruptedException e) {
@@ -37,16 +43,29 @@ public class Calculator implements Runnable {
                 }
 
                 synchronized (y) {
-                    int l = y.length;
+                    
+                   // y = new double[x.length];
+
+
                     for (int x = 0; x < l; x++) {
+                        
                         y[x] = 0.0;
-                        for (double n = 1.0; n < 10.0; n++){
+                        for (int n = 1; n < 10; n++){
+//
+                            //y[x] += string.fourierKoeff(n) * Math.sin(n * Math.PI * this.x[x] / 2) * Math.cos(8 * n * Math.PI * t);
+
+
                             y[x] += (string.fourierKoeff(n) * Math.cos(c * n * Math.PI * t / length)
                                     + string.fourierKoeffst(n) * Math.sin(c * n * Math.PI * t / length))
                                     * Math.sin(n * Math.PI * this.x[x] / length);
-//                            System.out.println("y" + x + "= " + y[x]);
+
+//                            y[x] += (1.0d / (6.0d * Math.pow(n, 2) * Math.pow(Math.PI, 2))) * Math.sin(n * Math.PI * this.x[x] / 2.0d)
+//                                    * Math.cos(8.0d * n * Math.PI * t);
+                            
 //                            System.out.println(string.fourierKoeff(n));
                         }
+                        
+                        System.out.println("y" + x + "= " + y[x]);
                     }
                     y.notify();
 
