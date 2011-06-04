@@ -86,9 +86,7 @@ public class GraphPlotPanel extends JPanel {
     int w = getWidth();
     int h = getHeight();
     // space between abscissa values calulated with the panel width
-    System.out.println(xMax+" "+xMin);
     double xScale = (w - 2 * PAD) / (xMax - xMin);
-    System.out.println(xScale);
     // space between ordinate values calculated with the panel height
     double yScale = (h - 2 * PAD) / (yMax - yMin);
 
