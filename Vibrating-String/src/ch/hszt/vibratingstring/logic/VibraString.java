@@ -156,9 +156,9 @@ public class VibraString {
     public double[] calcXGrid(int length, double precision) {
 
         int l = (int) (length / precision);
-        double[] x = new double[l];
+        double[] x = new double[l + 1];
         double step = 0.0d;
-        for (int i = 0; i < l; i++) {
+        for (int i = 0; i <= l; i++) {
             // no other than rounding mode UP or CEILING, otherwise the scaling of
             // the panel goes wrong
             x[i] = new BigDecimal(step).setScale(1, RoundingMode.UP).doubleValue();
@@ -178,7 +178,7 @@ public class VibraString {
      * @param n the nth value to solve in the loop
      * @return the coefficient
      */
-    public double fourierCoeff(double n, double a, double b) {
+    public double fourierCoeff(double n, double a, double b, IMathFunction f) {
 
         double h = b - a;
         double c = (a + b) / 2.0;
@@ -190,7 +190,7 @@ public class VibraString {
         if (Math.abs(Q2 - Q1) <= EPSILON) {
             return Q2 + (Q2 - Q1) / 15;
         } else {
-            return fourierCoeff(n, a, c) + fourierCoeff(n, c, b);
+            return fourierCoeff(n, a, c, f) + fourierCoeff(n, c, b,f);
         }
 
 
@@ -218,8 +218,8 @@ public class VibraString {
             for (int i = 0; i < yStart.length; i++) {
 
                 for (int n = 1; n < harmonicComp; n++) {
-                    yt[t][i] += ((2/length) * fourierCoeff(n, xGrid[0], xGrid[xGrid.length - 1]) * Math.cos(c * n * Math.PI * (t * timePrec) / length)
-                            + (2 / (c * n * Math.PI)) * fourierCoeff(n, xGrid[0], xGrid[xGrid.length - 1]) * Math.sin(c * n * Math.PI * (t * timePrec) / length))
+                    yt[t][i] += ((2/length) * fourierCoeff(n, xGrid[0], xGrid[xGrid.length - 1], f) * Math.cos(c * n * Math.PI * (t * timePrec) / length)
+                            + (2 / (c * n * Math.PI)) * fourierCoeff(n, xGrid[0], xGrid[xGrid.length - 1], g) * Math.sin(c * n * Math.PI * (t * timePrec) / length))
                             * Math.sin(n * Math.PI * xGrid[i] / length);
                 }
             }
