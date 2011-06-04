@@ -12,23 +12,23 @@ package ch.hszt.vibratingstring.logic.function;
  */
 public class SawToothFunction implements IMathFunction {
 
-  public double[] calc(double[] x) {
+  public double[] calc(double[] x, double length) {
 
     double[] y = new double[x.length];
 
     for (int i = 0; i < x.length; i++) {
-      y[i] = calc(x[i]);
+      y[i] = calc(x[i], length);
     }
 
     return y;
   }
 
-  public double calc(double x) {
-    return 1*Math.asin(Math.sin(2 * Math.PI *x));
-
+  public double calc(double x, double length) {
+    return 1 * Math.asin(Math.sin(2 * Math.PI / length * x));
   }
 
-    public double calcBn(double x, double n, int l) {
-        return Math.asin(Math.sin(1*x)) * Math.sin(n * Math.PI * x / l);
-    }
+  public double calcBn(double x, double n, double length) {
+    return 1 * Math.asin(Math.sin(2 * Math.PI / length * x))
+            * Math.sin(n * Math.PI * x / length);
+  }
 }

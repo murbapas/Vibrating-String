@@ -12,23 +12,21 @@ package ch.hszt.vibratingstring.logic.function;
  */
 public class SquareFunction implements IMathFunction {
 
-  public double[] calc(double[] x) {
+  public double[] calc(double[] x, double length) {
     double[] y = new double[x.length];
 
     for (int i = 0; i < x.length; i++) {
-      //y[i] = 6.0d * x[i] - Math.pow(x[i], 2.0d);
-      y[i] = calc(x[i]);
-      //System.out.println("y" + i + ": " + y[i]);
+      y[i] = calc(x[i], length);
     }
     return y;
   }
 
-  public double calc(double x) {
-    return (2 * x - Math.pow(x,2));
+  public double calc(double x, double length) {
+    return (length * x - Math.pow(x, 2));
   }
 
-  public double calcBn(double x, double n, int L){
-  return (2 * x - Math.pow(x,2)) * Math.sin(n * Math.PI * x / L);
-
+  public double calcBn(double x, double n, double length) {
+    return (length * x - Math.pow(x, 2))
+            * Math.sin(n * Math.PI * x / length);
   }
 }

@@ -12,15 +12,19 @@ package ch.hszt.vibratingstring.logic.function;
  */
 public class ZeroFunction implements IMathFunction {
 
-  public double[] calc(double[] x) {
+  public double[] calc(double[] x, double length) {
     double[] y = new double[x.length];
     for (int i = 0; i < x.length; i++) {
-      y[i] = 0;
+      y[i] = calc(x[i], length);
     }
     return y;
   }
 
-    public double calcBn(double x, double n, int l) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
+  public double calc(double x, double length) {
+    return 0.0d;
+  }
+
+  public double calcBn(double x, double n, double length) {
+    throw new UnsupportedOperationException("Not supported yet.");
+  }
 }

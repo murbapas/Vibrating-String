@@ -11,33 +11,34 @@ package ch.hszt.vibratingstring.logic.function;
  * @author Pascal Murbach
  */
 public class TriaFunction implements IMathFunction {
-    
-    double a = 1.0d / 48.0d;
+  
+  /**
+   * Coefficient for the function
+   */
+  private final double A = 1;//1.0d / 48.0d;
 
-  public double[] calc(double[] x) {
-    double l = x[x.length - 1];
+  public double[] calc(double[] x, double length) {
 
-    
-    //System.out.println("a: " + a);
     double[] y = new double[x.length];
 
-    for (int i = 0; i < x.length / 2; i++) {
-      y[i] = a * x[i];
-      //System.out.println("y" + i + " = " + y[i]);
-    }
-
-    for (int i = (x.length / 2); i < x.length; i++) {
-      y[i] = (l - x[i]) * a;
-      // System.out.println("y" + i + " = " + y[i]);
+    for (int i = 0; i < x.length ; i++) {
+      y[i] = calc(x[i], length);
     }
 
     return y;
   }
 
-    public double calcBn(double x, double n, int l) {
-        if (x <= l / 2){
-        return a * x * Math.sin(n * Math.PI * x / l);
-        }
-        return (l - x) * a *Math.sin(n * Math.PI * x / l);
+  public double calc(double x, double length) {
+    if (x <= length / 2) {
+      return A * x;
     }
+    return (length - x) * A;
+  }
+
+  public double calcBn(double x, double n, double length) {
+    if (x <= length / 2) {
+      return A * x * Math.sin(n * Math.PI * x / length);
+    }
+    return (length - x) * A * Math.sin(n * Math.PI * x / length);
+  }
 }
