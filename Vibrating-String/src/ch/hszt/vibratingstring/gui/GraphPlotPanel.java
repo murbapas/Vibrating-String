@@ -64,10 +64,31 @@ public class GraphPlotPanel extends JPanel {
     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
             RenderingHints.VALUE_ANTIALIAS_ON);
 
+    double[] newXExtremals = getExtremals(x);
+    double[] newYExtremals = getExtremals(y);
+
+    if (xMin > newXExtremals[0]) {
+      setxMin(newXExtremals[0]);
+    }
+
+    if (xMax < newXExtremals[1]) {
+      setxMax(newXExtremals[1]);
+    }
+
+    if (yMin > newYExtremals[0]) {
+      setyMin(newYExtremals[0]);
+    }
+
+    if (yMax < newYExtremals[1]) {
+      setyMax(newYExtremals[1]);
+    }
+
     int w = getWidth();
     int h = getHeight();
     // space between abscissa values calulated with the panel width
+    System.out.println(xMax+" "+xMin);
     double xScale = (w - 2 * PAD) / (xMax - xMin);
+    System.out.println(xScale);
     // space between ordinate values calculated with the panel height
     double yScale = (h - 2 * PAD) / (yMax - yMin);
 
@@ -121,7 +142,6 @@ public class GraphPlotPanel extends JPanel {
     if (x.length != y.length) {
       throw new IllegalArgumentException("x and y must be the same size! x: " + x.length + " y: " + y.length);
     }
-
     this.x = x;
     this.y = y;
 
@@ -135,15 +155,14 @@ public class GraphPlotPanel extends JPanel {
       this.xMin = xExtremals[0];
       this.xMax = xExtremals[1];
     }
-
   }
 
   public void setY(double[] y) {
     this.y = y;
     double[] yExtremals = getExtremals(y);
     if (this.yMin == null) {
-      this.yMin = 2 * yExtremals[0];
-      this.yMax = 2 * yExtremals[1];
+      this.yMin = yExtremals[0];
+      this.yMax = yExtremals[1];
     }
   }
 
@@ -153,12 +172,43 @@ public class GraphPlotPanel extends JPanel {
    * @param x the x-values
    * @param y the y-values
    */
-  private void setExtremals(double[] x, double[] y) {
-    double[] xExtremals = getExtremals(x);
-    double[] yExtremals = getExtremals(y);
-    this.xMin = xExtremals[0];
-    this.xMax = xExtremals[1];
-    this.yMin = 2 * yExtremals[0];
-    this.yMax = 2 * yExtremals[1];
+//  public void setExtremals(double[] x, double[] y) {
+//    double[] xExtremals = getExtremals(x);
+//    double[] yExtremals = getExtremals(y);
+//    this.xMin = xExtremals[0];
+//    this.xMax = xExtremals[1];
+//    this.yMin = yExtremals[0];
+//    this.yMax = yExtremals[1];
+//  }
+  public void setxMax(Double xMax) {
+    this.xMax = xMax;
+  }
+
+  public Double getxMax() {
+    return xMax;
+  }
+
+  public void setxMin(Double xMin) {
+    this.xMin = xMin;
+  }
+
+  public Double getxMin() {
+    return xMin;
+  }
+
+  public void setyMax(Double yMax) {
+    this.yMax = yMax;
+  }
+
+  public Double getyMax() {
+    return yMax;
+  }
+
+  public void setyMin(Double yMin) {
+    this.yMin = yMin;
+  }
+
+  public Double getyMin() {
+    return yMin;
   }
 }
