@@ -33,13 +33,12 @@ public class VibraString {
      * TODO add doc
      */
     private IMathFunction g;
-    private final double EPSILON = 1E-8;
+    private final double EPSILON = 1E-4;
     private double[] xGrid;
     private double[] yStart;
     private double timePrec;
     private double harmonicComp;
     private int slices;
-
     private double[][] yt;
 
     public double[][] getYt() {
@@ -202,11 +201,7 @@ public class VibraString {
      * @param n
      * @return
      */
-    public double fourierCoeffST(double n) {
-
-
-        return 0.0d;
-    }
+  
 
     public double[][] calcStringMovement() {
 
@@ -223,8 +218,8 @@ public class VibraString {
             for (int i = 0; i < yStart.length; i++) {
 
                 for (int n = 1; n < harmonicComp; n++) {
-                    yt[t][i] += (fourierCoeff(n, xGrid[0], xGrid[xGrid.length - 1]) * Math.cos(c * n * Math.PI * (t * timePrec) / length)
-                            + fourierCoeffST(n) * Math.sin(c * n * Math.PI * (t * timePrec) / length))
+                    yt[t][i] += ((2/length) * fourierCoeff(n, xGrid[0], xGrid[xGrid.length - 1]) * Math.cos(c * n * Math.PI * (t * timePrec) / length)
+                            + (2 / (c * n * Math.PI)) * fourierCoeff(n, xGrid[0], xGrid[xGrid.length - 1]) * Math.sin(c * n * Math.PI * (t * timePrec) / length))
                             * Math.sin(n * Math.PI * xGrid[i] / length);
                 }
             }
