@@ -11,6 +11,7 @@ import ch.hszt.vibratingstring.gui.VibraStringWindow.Calculator;
 import ch.hszt.vibratingstring.logic.VibraString;
 import ch.hszt.vibratingstring.logic.function.IMathFunction;
 import ch.hszt.vibratingstring.logic.function.SawToothFunction;
+import ch.hszt.vibratingstring.logic.function.SinFunction;
 import ch.hszt.vibratingstring.logic.function.SquareFunction;
 import ch.hszt.vibratingstring.logic.function.TriaFunction;
 import ch.hszt.vibratingstring.logic.function.ZeroFunction;
@@ -97,10 +98,10 @@ public class VibraStringWindow extends JFrame {
         stringP = new GraphPlotPanel();
         stringP.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
 
-        IMathFunction f = new SawToothFunction();
-        IMathFunction g = new ZeroFunction();
+        IMathFunction f = new SquareFunction();
+        IMathFunction g = new SquareFunction();
 
-        vibraString = new VibraString(2, 250.0d, f, g, 0.1d, 0.0001d, 10);
+        vibraString = new VibraString(2, 560.0d, f, g, 0.1d, 0.0001d, 10);
 
         double[] x = vibraString.getxGrid();
         double[] y = vibraString.getyStart();
@@ -202,6 +203,12 @@ public class VibraStringWindow extends JFrame {
 
         private double[][] yt;
 
+        double tau;
+
+        double timePrec;
+
+        private int tDecay = 0;
+
         /**
          * Creates a new instance of {@code VibraStringWindow}.
          * @param x the x-values
@@ -217,14 +224,21 @@ public class VibraStringWindow extends JFrame {
             pairOfValueCnt = y.length;
             slices = vibraString.getSlices();
             yt = vibraString.getYt();
+            tau = 2.0d / 0.1d;
+            timePrec = vibraString.getTimePrec();
+
 
         }
 
         public void run() {
             while (true) {
                 for (int t = 0; t < slices; t++) {
+
+
+
+
                     try {
-                        Thread.sleep(10);
+                        Thread.sleep(40);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -233,6 +247,8 @@ public class VibraStringWindow extends JFrame {
                         for (int i = 0; i < pairOfValueCnt; i++) {
 
                             y[i] = yt[t][i];
+                            yt[t][i] = yt[t][i] * Math.exp((-tDecay * timePrec) / tau);
+                            tDecay += 1;
                         }
                         y.notify();
                     }
