@@ -147,7 +147,7 @@ public class GraphPlotPanel extends JPanel {
     }
   }
 
-  /**
+  /** 
    * Sets the extremal values of x and y in order
    * to let the panel scale its dimensions accordingly
    * @param x the x-values

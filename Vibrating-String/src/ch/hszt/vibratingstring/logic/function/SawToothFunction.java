@@ -24,6 +24,11 @@ public class SawToothFunction implements IMathFunction {
   }
 
   public double calc(double x) {
-    return Math.asin(Math.sin(1*x));
+    return 1*Math.asin(Math.sin(2 * Math.PI *x));
+
   }
+
+    public double calcBn(double x, double n, int l) {
+        return Math.asin(Math.sin(1*x)) * Math.sin(n * Math.PI * x / l);
+    }
 }

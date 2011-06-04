@@ -21,4 +21,6 @@ public interface IMathFunction {
    * @return the result, the function-dependent values
    */
   public double[] calc(double[] x);
+
+  public double calcBn(double x, double n , int l);
 }

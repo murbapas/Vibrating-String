@@ -10,7 +10,9 @@ package ch.hszt.vibratingstring.gui;
 import ch.hszt.vibratingstring.gui.VibraStringWindow.Calculator;
 import ch.hszt.vibratingstring.logic.VibraString;
 import ch.hszt.vibratingstring.logic.function.IMathFunction;
+import ch.hszt.vibratingstring.logic.function.SawToothFunction;
 import ch.hszt.vibratingstring.logic.function.SquareFunction;
+import ch.hszt.vibratingstring.logic.function.TriaFunction;
 import ch.hszt.vibratingstring.logic.function.ZeroFunction;
 import static java.awt.Toolkit.getDefaultToolkit;
 import java.awt.BorderLayout;
@@ -50,7 +52,13 @@ public class VibraStringWindow extends JFrame {
    * The ratio between screen and windows height respectively
    */
   private final double RATIO = 0.95;
+  /**
+   * The calculator thread
+   */
   private Thread calculatorThread;
+  /**
+   * The graph updater thread
+   */
   private Thread graphUpdaterThread;
 
   /**
@@ -89,19 +97,22 @@ public class VibraStringWindow extends JFrame {
     stringP = new GraphPlotPanel();
     stringP.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
 
-    IMathFunction f = new SquareFunction();
+    IMathFunction f = new TriaFunction();
     IMathFunction g = new ZeroFunction();
+    
     vibraString = new VibraString(2, 160.0d, f, g);
-
     double precision = 0.1d;
     int l = (int) (vibraString.getLength() / precision);
     double[] x = new double[l];
     double step = 0.0d;
     for (int i = 0; i < l; i++) {
+      // no other than rounding mode UP or CEILING, otherwise the scaling of 
+      // the panel goes wrong
       x[i] = new BigDecimal(step).setScale(1, RoundingMode.UP).doubleValue();
-      //System.out.println(x[i]);
+      //System.out.println("muh : "+x[i]);
       step += precision;
     }
+    
     stringP.setX(x);
     double[] y = f.calc(x);
     stringP.setY(y);
@@ -190,7 +201,7 @@ public class VibraStringWindow extends JFrame {
     /**
      * The length of the vibrating string
      */
-    private int length;
+    private double length;
     /**
      * The count of pairs of (x/y)-values
      */
@@ -213,7 +224,7 @@ public class VibraStringWindow extends JFrame {
 
     public void run() {
       while (true) {
-        for (double t = 0; t < 100; t += 0.0001) {
+        for (double t = 0; t < 1; t += 0.0001) {
           try {
             Thread.sleep(20);
           } catch (InterruptedException e) {
@@ -224,8 +235,8 @@ public class VibraStringWindow extends JFrame {
             for (int i = 0; i < pairOfValueCnt; i++) {
 
               y[i] = 0.0;
-              for (int n = 1; n < 10; n++) {
-                y[i] += (vibraString.fourierCoeff(x, y, n) * Math.cos(c * n * Math.PI * t / length)
+              for (int n = 1; n < 20; n++) {
+                y[i] += (vibraString.fourierCoeff(n, x[0], x[x.length - 1]) * Math.cos(c * n * Math.PI * t / length)
                         + vibraString.fourierCoeffST(n) * Math.sin(c * n * Math.PI * t / length))
                         * Math.sin(n * Math.PI * x[i] / length);
               }

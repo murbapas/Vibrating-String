@@ -11,11 +11,13 @@ package ch.hszt.vibratingstring.logic.function;
  * @author Pascal Murbach
  */
 public class TriaFunction implements IMathFunction {
+    
+    double a = 1.0d / 48.0d;
 
   public double[] calc(double[] x) {
     double l = x[x.length - 1];
 
-    double a = 1.0d / 48.0d;
+    
     //System.out.println("a: " + a);
     double[] y = new double[x.length];
 
@@ -31,4 +33,11 @@ public class TriaFunction implements IMathFunction {
 
     return y;
   }
+
+    public double calcBn(double x, double n, int l) {
+        if (x <= l / 2){
+        return a * x * Math.sin(n * Math.PI * x / l);
+        }
+        return (l - x) * a *Math.sin(n * Math.PI * x / l);
+    }
 }

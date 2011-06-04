@@ -19,4 +19,8 @@ public class ZeroFunction implements IMathFunction {
     }
     return y;
   }
+
+    public double calcBn(double x, double n, int l) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }
