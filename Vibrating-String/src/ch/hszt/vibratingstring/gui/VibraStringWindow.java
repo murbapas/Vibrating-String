@@ -63,8 +63,6 @@ public class VibraStringWindow extends JFrame {
    * The graph updater thread
    */
   private volatile Thread graphUpdaterThread;
-  
-  private int tDecay;
 
   /**
    * Creates a new instance of {@code VibraStringWindow}
@@ -151,7 +149,6 @@ public class VibraStringWindow extends JFrame {
   private void setUpVibraStringPanel(Container contentPane) {
     vibraStringP = new GraphPlotPanel();
     vibraStringP.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
-    initVibraString();
     contentPane.add(vibraStringP, BorderLayout.CENTER);
   }
 
@@ -220,11 +217,11 @@ public class VibraStringWindow extends JFrame {
     /**
      * The y-values
      */
-    private final double[] y;
+    private double[] y;
     /**
      * The speed constant
      */
-    private double c;
+    //private double c;
     /**
      * The length of the vibrating string
      */
@@ -236,11 +233,12 @@ public class VibraStringWindow extends JFrame {
     /**
      * TODO add doc
      */
-    private int slices;
+    //private int slices;
     /**
      * TODO add doc
      */
     private double[][] yt;
+
     /**
      * TODO add doc
      */
@@ -252,8 +250,7 @@ public class VibraStringWindow extends JFrame {
     /**
      * TODO add doc
      */
-    
-
+    private double tDecay = 0;
     /**
      * Creates a new instance of {@code VibraStringWindow}.
      * @param x the x-values
@@ -264,21 +261,21 @@ public class VibraStringWindow extends JFrame {
       this.x = x;
       this.y = y;
       //this.vibraString = vibraString;
-      this.c = vibraString.getC();
+      //this.c = vibraString.getC();
       length = vibraString.getLength();
       pairOfValueCnt = y.length;
-      slices = vibraString.getSlices();
+      //slices = vibraString.getSlices();
       yt = vibraString.getYt();
       tau = 2.0d / 0.1d;
       timePrec = vibraString.getTimePrec();
-      
+      tDecay = 0;
+
     }
 
     @Override
     public void run() {
-      //Thread thisThread = Thread.currentThread();
-      while (calculatorThread != null) {
-        for (int t = 0; t < slices; t++) {
+      while (calculatorThread != null) {        
+        for (int t = 0; t < vibraString.getSlices(); t++) {
 
           try {
             Thread.sleep(10);
@@ -288,24 +285,25 @@ public class VibraStringWindow extends JFrame {
 
           synchronized (y) {
             for (int i = 0; i < pairOfValueCnt; i++) {
-              y[i] = yt[t][i];
-              System.out.println(y[i]);
-              yt[t][i] *= Math.exp((-tDecay * timePrec) / tau);
+              y[i] = vibraString.getYt()[t][i] * Math.exp((-tDecay * timePrec / tau));//yt[t][i];
+                //y = vibraString.getyTWithDecay();              
+//              yt[t][i] *= Math.exp((-tDecay * timePrec) / tau);
               tDecay += 1;
+              System.out.println(y[i]);
             }
             y.notify();
-          }
 
-          // stop threads if all y-values are 0.0
-          int zeroCnt = 0;
-          for (int i = 0; i < pairOfValueCnt; i++) {
-            if (Math.abs(y[i]) == 0.0d) {
-              zeroCnt += 1;
+            // stop threads if all y-values are 0.0
+            int zeroCnt = 0;
+            for (int i = 0; i < pairOfValueCnt; i++) {
+              if (Math.abs(y[i]) <= Math.pow(10, -17)) {
+                zeroCnt += 1;
+              }
             }
-          }
-          if (zeroCnt == y.length) {
-            stopThreads();
-            startB.setText("Start");
+            if (zeroCnt == y.length) {
+              stopThreads();
+              startB.setText("Start");
+            }
           }
         }
       }
@@ -317,7 +315,6 @@ public class VibraStringWindow extends JFrame {
    */
   private void startThreads() {
     vibraString.resetYt();
-    tDecay = 0;
     calculatorThread = new CalculatorThread(vibraString.getxGrid(), vibraString.getyStart());
     graphUpdaterThread = new GraphUpdaterThread(vibraString.getxGrid(), vibraString.getyStart());
     calculatorThread.start();

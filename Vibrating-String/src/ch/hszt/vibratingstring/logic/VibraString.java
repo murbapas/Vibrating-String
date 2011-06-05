@@ -296,11 +296,7 @@ public class VibraString {
   public double[][] getYt() {
     return yt;
   }
-  
-  public double[][] getytStart() {
-    return ytStart;
-  }
-  
+
   /**
    * Sets the yt-values to the initial values that were
    * calculated in the constructor
