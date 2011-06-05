@@ -1,17 +1,19 @@
 /*
  * TriaFunction.java (Created on May 22, 2011, 1:07:25 AM)
  * 
- * @author Pascal Murbach
+ * @author Pascal Murbach / Farhan Fayyaz
  * 
  * Implementation of the calculation of the triangle function
  */
 package ch.hszt.vibratingstring.logic.function;
 
 /**
- * @author Pascal Murbach
+ * A {@code TriaFunction}.
+ * 
+ * @author Pascal Murbach / Farhan Fayyaz
  */
 public class TriaFunction implements IMathFunction {
-  
+
   /**
    * Coefficient for the function
    */
@@ -21,7 +23,7 @@ public class TriaFunction implements IMathFunction {
 
     double[] y = new double[x.length];
 
-    for (int i = 0; i < x.length ; i++) {
+    for (int i = 0; i < x.length; i++) {
       y[i] = calc(x[i], length);
     }
 
@@ -36,9 +38,6 @@ public class TriaFunction implements IMathFunction {
   }
 
   public double calcBn(double x, double n, double length) {
-    if (x <= length / 2) {
-      return A * x * Math.sin(n * Math.PI * x / length);
-    }
-    return (length - x) * A * Math.sin(n * Math.PI * x / length);
+    return calc(x,length) * Math.sin(n * Math.PI * x / length);
   }
 }

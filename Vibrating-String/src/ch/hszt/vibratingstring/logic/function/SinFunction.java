@@ -1,12 +1,16 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * SinFunction.java (Created on May 22, 2011, 1:07:25 AM)
+ * 
+ * @author Pascal Murbach / Farhan Fayyaz
+ * 
+ * Implementation of the calculation of the sawtooth function
  */
 package ch.hszt.vibratingstring.logic.function;
 
 /**
+ * A {@code SinFunction}.
  *
- * @author Pascal Murbach
+ * @author Pascal Murbach / Farhan Fayyaz
  */
 public class SinFunction implements IMathFunction {
 
@@ -17,12 +21,12 @@ public class SinFunction implements IMathFunction {
     }
     return y;
   }
-  
+
   public double calc(double x, double length) {
     return Math.sin(2 * Math.PI / length * x);
   }
 
   public double calcBn(double x, double n, double length) {
-    return Math.sin(2 * Math.PI / length * x) * Math.sin(n * Math.PI * x / length);
+    return calc(x, length) * Math.sin(n * Math.PI * x / length);
   }
 }

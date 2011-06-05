@@ -1,14 +1,16 @@
 /*
  * SawToothFunction.java (Created on May 22, 2011, 1:07:25 AM)
  * 
- * @author Pascal Murbach
+ * @author Pascal Murbach / Farhan Fayyaz
  * 
  * Implementation of the calculation of the sawtooth function
  */
 package ch.hszt.vibratingstring.logic.function;
 
 /**
- * @author Pascal Murbach
+ * A {@code SawToothFunction}.
+ * 
+ * @author Pascal Murbach / Farhan Fayyaz
  */
 public class SawToothFunction implements IMathFunction {
 
@@ -28,7 +30,6 @@ public class SawToothFunction implements IMathFunction {
   }
 
   public double calcBn(double x, double n, double length) {
-    return 1 * Math.asin(Math.sin(2 * Math.PI / length * x))
-            * Math.sin(n * Math.PI * x / length);
+    return calc(x, length) * Math.sin(n * Math.PI * x / length);
   }
 }

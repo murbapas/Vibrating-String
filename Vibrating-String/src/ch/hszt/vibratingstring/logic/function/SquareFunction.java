@@ -1,14 +1,16 @@
 /*
  * SquareFunction.java (Created on May 22, 2011, 1:07:25 AM)
  * 
- * @author Pascal Murbach
+ * @author Pascal Murbach / Farhan Fayyaz
  * 
  * Implementation of the calculation of the square function
  */
 package ch.hszt.vibratingstring.logic.function;
 
 /**
- * @author Pascal Murbach
+ * A {@code SquareFunction}.
+ * 
+ * @author Pascal Murbach / Farhan Fayyaz
  */
 public class SquareFunction implements IMathFunction {
 
@@ -26,7 +28,6 @@ public class SquareFunction implements IMathFunction {
   }
 
   public double calcBn(double x, double n, double length) {
-    return (length * x - Math.pow(x, 2))
-            * Math.sin(n * Math.PI * x / length);
+    return calc(x, length) * Math.sin(n * Math.PI * x / length);
   }
 }

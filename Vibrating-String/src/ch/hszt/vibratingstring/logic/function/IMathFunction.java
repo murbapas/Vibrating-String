@@ -1,7 +1,7 @@
 /*
  * IMathFunction.java (Created on May 22, 2011, 1:08:12 AM)
  *
- * @author Pascal Murbach
+ * @author Pascal Murbach / Farhan Fayyaz
  *
  * The Interface for a mathematical function which provides 
  * a method to numerically calculate the function with a set
@@ -10,7 +10,9 @@
 package ch.hszt.vibratingstring.logic.function;
 
 /**
- * @author Pascal Murbach
+ * A {@code IMathFunction}.
+ * 
+ * @author Pascal Murbach / Farhan Fayyaz
  */
 public interface IMathFunction {
 

@@ -1,7 +1,7 @@
 /*
  * GraphPlotPanel.java (Created on May 22, 2011, 1:07:25 AM)
  * 
- * @author Farhan Fayyaz (fafa at ten.ch)
+ * @author Farhan Fayyaz / Pascal Murbach
  * 
  * This is the panel in which the graph is painted
  */
@@ -17,7 +17,7 @@ import javax.swing.JPanel;
 /**
  * A {@code GraphPlotPanel}.
  *
- * @author Farhan Fayyaz
+ * @author Farhan Fayyaz / Pascal Murbach
  */
 @SuppressWarnings("serial")
 public class GraphPlotPanel extends JPanel {
@@ -97,12 +97,11 @@ public class GraphPlotPanel extends JPanel {
 
     // Connect the data points with lines
     g2.setPaint(Color.blue);
-    //System.out.println("hier" + y[1]);
+
     for (int i = 0; i < x.length - 1; i++) {
       double x1 = (PAD + (xScale * x[i]));
-      //System.out.println("x" + i + " " + x1);
       double y1 = ((h - PAD) / 2) - (yScale * y[i]);
-      //System.out.println("y" + i + " " + y1);
+
       double x2 = (PAD + (xScale * x[i + 1]));
       double y2 = ((h - PAD) / 2) - (yScale * y[i + 1]);
       g2.draw(new Line2D.Double(x1, y1, x2, y2));
@@ -146,6 +145,10 @@ public class GraphPlotPanel extends JPanel {
     repaint();
   }
 
+  /**
+   * Sets the x-values
+   * @param x the x-values to set
+   */
   public void setX(double[] x) {
     this.x = x;
     double[] xExtremals = getExtremals(x);
@@ -155,57 +158,75 @@ public class GraphPlotPanel extends JPanel {
     }
   }
 
+  /**
+   * Sets the y-values
+   * @param y the y-values to set
+   */
   public void setY(double[] y) {
     this.y = y;
     double[] yExtremals = getExtremals(y);
     if (this.yMin == null) {
-      this.yMin = yExtremals[0];
-      this.yMax = yExtremals[1];
+      this.yMin = 2 * yExtremals[0];
+      this.yMax = 2 * yExtremals[1];
     }
   }
 
-  /** 
-   * Sets the extremal values of x and y in order
-   * to let the panel scale its dimensions accordingly
-   * @param x the x-values
-   * @param y the y-values
+  /**
+   * Sets the maximum x-value
+   * @param xMax the maximum x-value to set
    */
-//  public void setExtremals(double[] x, double[] y) {
-//    double[] xExtremals = getExtremals(x);
-//    double[] yExtremals = getExtremals(y);
-//    this.xMin = xExtremals[0];
-//    this.xMax = xExtremals[1];
-//    this.yMin = yExtremals[0];
-//    this.yMax = yExtremals[1];
-//  }
   public void setxMax(Double xMax) {
     this.xMax = xMax;
   }
 
+  /**
+   * @return the maximum x-value
+   */
   public Double getxMax() {
     return xMax;
   }
 
+  /**
+   * Sets the minimum x-value
+   * @param xMin the minimum x-value to set
+   */
   public void setxMin(Double xMin) {
     this.xMin = xMin;
   }
 
+  /**
+   * @return the minimum x-value
+   */
   public Double getxMin() {
     return xMin;
   }
 
+  /**
+   * Sets the maximum y-value
+   * @param yMax the maximum y-value to set
+   */
   public void setyMax(Double yMax) {
     this.yMax = yMax;
   }
 
+  /**
+   * @return the maximum y-value
+   */
   public Double getyMax() {
     return yMax;
   }
 
+  /**
+   * Sets the minimum y-value
+   * @param yMin the minimum y-value to set
+   */
   public void setyMin(Double yMin) {
     this.yMin = yMin;
   }
 
+  /**
+   * @return the minimum y-value
+   */
   public Double getyMin() {
     return yMin;
   }

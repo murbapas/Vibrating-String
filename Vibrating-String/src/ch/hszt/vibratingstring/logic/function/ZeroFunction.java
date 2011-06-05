@@ -1,14 +1,16 @@
 /*
  * VibraString.java (Created on May 22, 2011, 1:07:25 AM)
  * 
- * @author Pascal Murbach
+ * @author Pascal Murbach / Farhan Fayyaz
  * 
  * Implementation of the calculation of the zero function
  */
 package ch.hszt.vibratingstring.logic.function;
 
 /**
- * @author Pascal Murbach
+ * A {@code ZeroFunction}.
+ * 
+ * @author Pascal Murbach / Farhan Fayyaz
  */
 public class ZeroFunction implements IMathFunction {
 
