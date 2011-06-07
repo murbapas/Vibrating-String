@@ -36,4 +36,9 @@ public class RandomFunction implements IMathFunction {
   public double calcBn(double x, double n, double length) {
     return y[(int) (x * 10)] * Math.sin(n * Math.PI * x / length);
   }
+
+  @Override
+  public String toString() {
+    return "Random";
+  }
 }

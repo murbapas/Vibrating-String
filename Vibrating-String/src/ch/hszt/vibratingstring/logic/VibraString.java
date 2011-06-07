@@ -81,12 +81,13 @@ public class VibraString {
     this.g = g;
     this.timePrec = timePrec;
     this.harmonicComp = harmonicComp;
+    calcSlices();
 
-    xGrid = calcXGrid(length, precision);
-    yStart = calcYStart(f, xGrid);
-    slices = (int) ((2 * length) / (speed * timePrec));
-    yt = calcStringMovement();
-    ytStart = yt;
+    //xGrid = calcXGrid(length, precision);
+    //yStart = calcYStart(f, xGrid);
+    //slices = (int) ((2 * length) / (speed * timePrec));
+    //yt = calcStringMovement();
+    //ytStart = yt;
   }
 
   /**
@@ -95,9 +96,9 @@ public class VibraString {
    * @param precision the precision
    * @return the x-grid
    */
-  public double[] calcXGrid(double length, double precision) {
-
-    int l = (int) (length / precision);
+  //public double[] calcXGrid(double length, double precision) {
+public void calcXGrid(double length, double precision) {
+    int l = (int) Math.abs((length / precision));
     double[] x = new double[l + 1];
     double step = 0.0;
 
@@ -109,7 +110,8 @@ public class VibraString {
       //System.out.println(x[i]);
       step += precision;
     }
-    return x;
+    //return x;
+    this.xGrid = x;
   }
 
   /**
@@ -118,8 +120,10 @@ public class VibraString {
    * @param x
    * @return 
    */
-  public double[] calcYStart(IMathFunction f, double[] x) {
-    return f.calc(x, length);
+  //public double[] calcYStart(IMathFunction f, double[] x) {
+public void calcYStart(IMathFunction f, double[] x) {    
+    this.yStart = f.calc(x, length);
+    //return f.calc(x, length);
   }
 
   /**
@@ -150,11 +154,13 @@ public class VibraString {
    * TODO add doc
    * @return TODO add doc
    */
-  public double[][] calcStringMovement() {
+  //public double[][] calcStringMovement() {
+  public void calcStringMovement() {
     System.out.println("calc string movement");
 
     // TODO rename
-    double[][] yt = new double[slices][yStart.length];
+    //double[][] yt = new double[slices][yStart.length];
+    yt = new double[slices][yStart.length];    
 
     for (int i = 0; i < yStart.length; i++) {
       yt[0][i] = yStart[i];
@@ -171,8 +177,10 @@ public class VibraString {
         }
       }
     }
+    
+    ytStart = yt;
 
-    return yt;
+    //return yt;
   }
 
   /**
@@ -185,9 +193,9 @@ public class VibraString {
   /**
    * @param length the length to set
    */
-  public void setLength(int length) {
+  public void setLength(double length) {
     this.length = length;
-  }
+  }  
 
   /**
    * @return the speed constant
@@ -264,8 +272,8 @@ public class VibraString {
    * Set the slices
    * @param slices the slices to set
    */
-  public void setSlices(int slices) {
-    this.slices = slices;
+  private void calcSlices() {
+    this.slices = (int) ((2 * length) / (speed * timePrec));
   }
 
   /**
@@ -299,9 +307,10 @@ public class VibraString {
 
   /**
    * Sets the yt-values to the initial values that were
-   * calculated in the constructor
+   * calculated in the constructor. for faster re-initialization
+   * of the string
    */
   public void resetYt() {
     this.yt = ytStart;
-  }
+  } 
 }

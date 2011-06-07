@@ -28,12 +28,17 @@ public class RectangleFunction implements IMathFunction {
     double b = 2 * Math.PI / length;
 
     if (x >= 0.0d || x <= length / 2) {
-      return Math.sin(b * x) / Math.abs(Math.sin(b * x));
+     // return Math.sin(b * x) / Math.abs(Math.sin(b * x));
     }
     return 1.0d;
   }
 
   public double calcBn(double x, double n, double length) {
     throw new UnsupportedOperationException("Not supported yet.");
+  }
+
+  @Override
+  public String toString() {
+    return "Rectangle";
   }
 }

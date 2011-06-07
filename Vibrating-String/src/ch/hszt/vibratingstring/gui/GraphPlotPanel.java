@@ -141,34 +141,20 @@ public class GraphPlotPanel extends JPanel {
     }
     this.x = x;
     this.y = y;
-
-    repaint();
-  }
-
-  /**
-   * Sets the x-values
-   * @param x the x-values to set
-   */
-  public void setX(double[] x) {
-    this.x = x;
+    
     double[] xExtremals = getExtremals(x);
     if (this.xMin == null) {
       this.xMin = xExtremals[0];
       this.xMax = xExtremals[1];
-    }
-  }
-
-  /**
-   * Sets the y-values
-   * @param y the y-values to set
-   */
-  public void setY(double[] y) {
-    this.y = y;
+    } 
+    
     double[] yExtremals = getExtremals(y);
     if (this.yMin == null) {
       this.yMin = 2 * yExtremals[0];
       this.yMax = 2 * yExtremals[1];
-    }
+    }    
+
+    repaint();
   }
 
   /**
@@ -182,7 +168,7 @@ public class GraphPlotPanel extends JPanel {
   /**
    * @return the maximum x-value
    */
-  public Double getxMax() {
+  private Double getxMax() {
     return xMax;
   }
 
