@@ -1,5 +1,5 @@
 /*
- * VibraStringProgress.java (Created on Jun 12, 2011, 7:30:50 PM)
+ * VibraStringProgressBar.java (Created on Jun 12, 2011, 7:30:50 PM)
  * 
  * @author Farhan Fayyaz (fafa at ten.ch)
  * 
@@ -13,12 +13,12 @@ import java.awt.event.ActionListener;
 import javax.swing.JProgressBar;
 
 /**
- * A {@code VibraStringProgress}.
+ * A {@code VibraStringProgressBar}.
  *
  * @author Farhan Fayyaz
  */
 @SuppressWarnings("serial")
-public class VibraStringProgress extends JProgressBar
+public class VibraStringProgressBar extends JProgressBar
         implements ActionListener, Runnable {
 
   /**
@@ -26,7 +26,7 @@ public class VibraStringProgress extends JProgressBar
    * @param min the min value
    * @param max the max value
    */
-  public VibraStringProgress(int min, int max) {
+  public VibraStringProgressBar(int min, int max) {
     super(min, max);
   }
 

@@ -113,7 +113,7 @@ public class VibraStringWindow extends JFrame {
    * how far the calculation has gone
    * yet
    */
-  public static VibraStringProgress progressBar;
+  public static VibraStringProgressBar progressBar;
 
   /**
    * Creates a new instance of {@code VibraStringWindow}
@@ -179,7 +179,7 @@ public class VibraStringWindow extends JFrame {
     leftP.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
     leftP.setPreferredSize(new Dimension(200, 100));
 
-    progressBar = new VibraStringProgress(0, 100);
+    progressBar = new VibraStringProgressBar(0, 100);
     progressBar.setValue(0);
     progressBar.setStringPainted(true);
 
