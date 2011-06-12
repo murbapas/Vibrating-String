@@ -29,8 +29,8 @@ public class ZeroFunction implements IMathFunction {
   public double calcBn(double x, double n, double length) {
     return 0.0d;
   }
-  
-    @Override
+
+  @Override
   public String toString() {
     return "Zero";
   }

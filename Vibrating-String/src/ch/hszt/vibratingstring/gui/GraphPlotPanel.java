@@ -137,22 +137,23 @@ public class GraphPlotPanel extends JPanel {
    */
   public void setValues(double[] x, double[] y) {
     if (x.length != y.length) {
-      throw new IllegalArgumentException("x and y must be the same size! x: " + x.length + " y: " + y.length);
+      throw new IllegalArgumentException("x and y must be the same size! x: "
+              + x.length + " y: " + y.length);
     }
     this.x = x;
     this.y = y;
-    
+
     double[] xExtremals = getExtremals(x);
     if (this.xMin == null) {
       this.xMin = xExtremals[0];
       this.xMax = xExtremals[1];
-    } 
-    
+    }
+
     double[] yExtremals = getExtremals(y);
     if (this.yMin == null) {
       this.yMin = 2 * yExtremals[0];
       this.yMax = 2 * yExtremals[1];
-    }    
+    }
 
     repaint();
   }

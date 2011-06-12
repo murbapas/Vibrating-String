@@ -27,41 +27,48 @@ public class VibraString {
    */
   private double speed;
   /**
-   * TODO add doc
+   * The start function
    */
   private IMathFunction f;
   /**
-   * TODO add doc
+   * The second function
    */
   private IMathFunction g;
   /**
-   * TODO add doc
+   * The precision, when the integration method 
+   * should return the result
    */
   private final double EPSILON = 1E-4;
   /**
-   * TODO add doc
+   * The grid of x-values used to calculate the y-values
    */
   private double[] xGrid;
   /**
-   * TODO add doc
+   * The initial y-values of the start function
    */
   private double[] yStart;
   /**
-   * TODO add doc
+   * The time precision
    */
   private double timePrec;
   /**
-   * TODO add doc
+   * The count of harmonic components
    */
-  private double harmonicComp;
+  private int harmonicComp;
   /**
-   * TODO add doc
+   * Row dimension of the yt-array
+   * The y-values of one particular point of time 
+   * are stored in a slice
    */
   private int slices;
   /**
-   * TODO add doc
+   * y-values for each point of time
    */
   private double[][] yt;
+  /**
+   * initial y-values for each point of time
+   * to have the values accessible for another plot
+   */
   private double[][] ytStart;
 
   /**
@@ -69,12 +76,18 @@ public class VibraString {
    * @param length the length of the vibrating string
    * @param speed the speed
    * @param f the initial function
-   * @param g TODO add doc
+   * @param g the second function
    * @param precision the precision
    * @param timePrec the time precision
    * @param harmonicComp the harmonic component 
    */
-  public VibraString(double length, double speed, IMathFunction f, IMathFunction g, double precision, double timePrec, int harmonicComp) {
+  public VibraString(double length,
+          double speed,
+          IMathFunction f,
+          IMathFunction g,
+          double precision,
+          double timePrec,
+          int harmonicComp) {
     this.length = length;
     this.speed = speed;
     this.f = f;
@@ -82,12 +95,6 @@ public class VibraString {
     this.timePrec = timePrec;
     this.harmonicComp = harmonicComp;
     calcSlices();
-
-    //xGrid = calcXGrid(length, precision);
-    //yStart = calcYStart(f, xGrid);
-    //slices = (int) ((2 * length) / (speed * timePrec));
-    //yt = calcStringMovement();
-    //ytStart = yt;
   }
 
   /**
@@ -96,38 +103,32 @@ public class VibraString {
    * @param precision the precision
    * @return the x-grid
    */
-  //public double[] calcXGrid(double length, double precision) {
-public void calcXGrid(double length, double precision) {
+  public double[] calcXGrid(double length, double precision) {
     int l = (int) Math.abs((length / precision));
     double[] x = new double[l + 1];
     double step = 0.0;
 
     for (int i = 0; i <= l; i++) {
-      //System.out.println(step);
-      // no other than rounding mode UP or CEILING, otherwise the scaling of
-      // the panel goes wrong
       x[i] = new BigDecimal(step).setScale(1, RoundingMode.HALF_EVEN).doubleValue();
-      //System.out.println(x[i]);
       step += precision;
     }
-    //return x;
     this.xGrid = x;
+    return x;
   }
 
   /**
-   * 
+   * Calculates the initial y-values
    * @param f
    * @param x
-   * @return 
+   * @return the initial y-values
    */
-  //public double[] calcYStart(IMathFunction f, double[] x) {
-public void calcYStart(IMathFunction f, double[] x) {    
+  public double[] calcYStart(IMathFunction f, double[] x) {
     this.yStart = f.calc(x, length);
-    //return f.calc(x, length);
+    return this.yStart;
   }
 
   /**
-   * Calculate the fourier coefficient using simpson's quadrature
+   * Calculate the fourier coefficient using simpson's adaptive quadrature
    * method
    * @param n the nth value to solve in the loop
    * @param a the first x-value
@@ -142,45 +143,81 @@ public void calcYStart(IMathFunction f, double[] x) {
     double d = (a + c) / 2.0;
     double e = (b + c) / 2.0;
 
-    double Q1 = h / 6 * (f.calcBn(a, n, length) + 4 * f.calcBn(c, n, length) + f.calcBn(b, n, length));
-    double Q2 = h / 12 * (f.calcBn(a, n, length) + 4 * f.calcBn(d, n, length) + 2 * f.calcBn(c, n, length) + 4 * f.calcBn(e, n, length) + f.calcBn(b, n, length));
+    double Q1 = h / 6 * (f.calcBn(a, n, length)
+            + 4 * f.calcBn(c, n, length) + f.calcBn(b, n, length));
+    double Q2 = h / 12 * (f.calcBn(a, n, length)
+            + 4 * f.calcBn(d, n, length)
+            + 2 * f.calcBn(c, n, length)
+            + 4 * f.calcBn(e, n, length) + f.calcBn(b, n, length));
     if (Math.abs(Q2 - Q1) <= EPSILON) {
       return Q2 + (Q2 - Q1) / 15;
     }
     return fourierCoeff(n, a, c, f) + fourierCoeff(n, c, b, f);
   }
 
-  /**
-   * TODO add doc
-   * @return TODO add doc
-   */
-  //public double[][] calcStringMovement() {
-  public void calcStringMovement() {
-    System.out.println("calc string movement");
+  public double adaptiveSimpsons(double n, IMathFunction f,
+          double a, double b,
+          double epsilon,
+          int maxRecursionDepth) {
+    double c = (a + b) / 2, h = b - a;
+    double fa = f.calcBn(a, n, length);
+    double fb = f.calcBn(b, n, length);
+    double fc = f.calcBn(c, n, length);
+    double S = (h / 6) * (fa + 4 * fc + fb);
+    return adaptiveSimpsonsAux(n, f, a, b, epsilon, S, fa, fb, fc, maxRecursionDepth);
+  }
 
-    // TODO rename
-    //double[][] yt = new double[slices][yStart.length];
-    yt = new double[slices][yStart.length];    
+  private double adaptiveSimpsonsAux(double n, IMathFunction f, double a, double b, double epsilon,
+          double S, double fa, double fb, double fc, int bottom) {
+    double c = (a + b) / 2, h = b - a;
+    double d = (a + c) / 2, e = (c + b) / 2;
+    double fd = f.calcBn(d, n, length), fe = f.calcBn(e, n, length);
+    double Sleft = (h / 12) * (fa + 4 * fd + fc);
+    double Sright = (h / 12) * (fc + 4 * fe + fb);
+    double S2 = Sleft + Sright;
+    if (bottom <= 0 || Math.abs(S2 - S) <= 15 * epsilon) {
+      return S2 + (S2 - S) / 15;
+    }
+    return adaptiveSimpsonsAux(n, f, a, c, epsilon / 2, Sleft, fa, fc, fd, bottom - 1)
+            + adaptiveSimpsonsAux(n, f, c, b, epsilon / 2, Sright, fc, fb, fe, bottom - 1);
+  }
+
+  /**
+   * Calculates the whole string movement over
+   * time and saves the values in a double[][] array
+   * @return the calculated string movement
+   */
+  public double[][] calcStringMovement() {
+    yt = new double[slices][yStart.length];
 
     for (int i = 0; i < yStart.length; i++) {
       yt[0][i] = yStart[i];
     }
-
+   
     for (int t = 1; t < slices; t++) {
-      for (int i = 0; i < yStart.length; i++) {
+      for (int i = 0; i < yStart.length; i++) {             
         for (int n = 1; n < harmonicComp; n++) {
-          yt[t][i] += ((2 / length) * fourierCoeff(n, xGrid[0], xGrid[xGrid.length - 1], f)
+          yt[t][i] += ((2 / length)
+                  * adaptiveSimpsons(n, f, xGrid[0], xGrid[xGrid.length - 1], EPSILON, 100)
                   * Math.cos(speed * n * Math.PI * (t * timePrec) / length)
-                  + (2 / (speed * n * Math.PI)) * fourierCoeff(n, xGrid[0], xGrid[xGrid.length - 1], g)
+                  + (2 / (speed * n * Math.PI))
+                  * adaptiveSimpsons(n, g, xGrid[0], xGrid[xGrid.length - 1], EPSILON, 100)
                   * Math.sin(speed * n * Math.PI * (t * timePrec) / length))
                   * Math.sin(n * Math.PI * xGrid[i] / length);
+//          yt[t][i] += ((2 / length)
+//                  * fourierCoeff(n, xGrid[0], xGrid[xGrid.length - 1], f)
+//                  * Math.cos(speed * n * Math.PI * (t * timePrec) / length)
+//                  + (2 / (speed * n * Math.PI))
+//                  * fourierCoeff(n, xGrid[0], xGrid[xGrid.length - 1], g)
+//                  * Math.sin(speed * n * Math.PI * (t * timePrec) / length))
+//                  * Math.sin(n * Math.PI * xGrid[i] / length);
         }
       }
     }
-    
+
     ytStart = yt;
 
-    //return yt;
+    return yt;
   }
 
   /**
@@ -195,7 +232,7 @@ public void calcYStart(IMathFunction f, double[] x) {
    */
   public void setLength(double length) {
     this.length = length;
-  }  
+  }
 
   /**
    * @return the speed constant
@@ -257,7 +294,7 @@ public void calcYStart(IMathFunction f, double[] x) {
    * Sets the harmonic component
    * @param harmonicComp the harmonic component to set
    */
-  public void setHarmonicComp(double harmonicComp) {
+  public void setHarmonicComp(int harmonicComp) {
     this.harmonicComp = harmonicComp;
   }
 
@@ -270,7 +307,6 @@ public void calcYStart(IMathFunction f, double[] x) {
 
   /**
    * Set the slices
-   * @param slices the slices to set
    */
   private void calcSlices() {
     this.slices = (int) ((2 * length) / (speed * timePrec));
@@ -299,7 +335,8 @@ public void calcYStart(IMathFunction f, double[] x) {
   }
 
   /**
-   * @return TODO add doc
+   * @return the whole movement of the string
+   * over time
    */
   public double[][] getYt() {
     return yt;
@@ -312,5 +349,5 @@ public void calcYStart(IMathFunction f, double[] x) {
    */
   public void resetYt() {
     this.yt = ytStart;
-  } 
+  }
 }
