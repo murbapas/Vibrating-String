@@ -28,6 +28,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
 
@@ -109,11 +110,25 @@ public class VibraStringWindow extends JFrame {
    */
   private JTextField tauT;
   /**
+   * precision of integration text field
+   */
+  private JTextField epsT;
+  /**
    * The progress bar to show 
    * how far the calculation has gone
    * yet
    */
-  public static VibraStringProgressBar progressBar;
+  private VibraStringProgressBar progressBar;
+  /**
+   * The thread for displaying the progress bar
+   */
+  private Thread progressBarThread;
+  /**
+   * TODO find a better solution
+   * Thread to make the drawing of the progress 
+   * bar possible. This is obviously garbage
+   */
+  private Thread controlThread;
 
   /**
    * Creates a new instance of {@code VibraStringWindow}
@@ -121,19 +136,20 @@ public class VibraStringWindow extends JFrame {
   public VibraStringWindow() {
     configure();
     createGUI();
+
     vibraString = new VibraString(
             Double.parseDouble(stringLengthT.getText().trim()),
             Double.parseDouble(speedT.getText().trim()),
             (IMathFunction) startFunctionCB.getSelectedItem(),
             (IMathFunction) secondFunctionCB.getSelectedItem(),
-            Double.parseDouble(precisionT.getText().trim()),
             Double.parseDouble(timePrecisionT.getText().trim()),
-            Integer.parseInt(harmonicCompT.getText().trim()));
+            Integer.parseInt(harmonicCompT.getText().trim()),
+            Double.parseDouble(epsT.getText().trim()));
     vibraString.calcXGrid(
             Double.parseDouble(stringLengthT.getText().trim()),
             Double.parseDouble(precisionT.getText().trim()));
+    
     vibraString.calcYStart(vibraString.getF(), vibraString.getxGrid());
-
     vibraStringP.setValues(vibraString.getxGrid(), vibraString.getyStart());
   }
 
@@ -182,15 +198,15 @@ public class VibraStringWindow extends JFrame {
     progressBar = new VibraStringProgressBar(0, 100);
     progressBar.setValue(0);
     progressBar.setStringPainted(true);
+    leftP.add(progressBar, BorderLayout.CENTER);
 
     startB = createStartB();
 
     leftP.add(startB, BorderLayout.NORTH);
-    leftP.add(progressBar, BorderLayout.CENTER);
 
-    JPanel centerP = new JPanel();
-    centerP.setLayout(new GridLayout(1, 1, 5, 0));
-    centerP.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
+    JPanel rightP = new JPanel();
+    rightP.setLayout(new GridLayout(1, 1, 5, 0));
+    rightP.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
 
     IMathFunction[] functionList = {
       new SquareFunction(),
@@ -210,6 +226,7 @@ public class VibraStringWindow extends JFrame {
     JLabel harmonicCompL = new JLabel("Harmonic");
     JLabel decayL = new JLabel("Decay");
     JLabel tauL = new JLabel("DecayPrec");
+    JLabel epsL = new JLabel("Eps");
 
     startFunctionCB = new JComboBox(functionList);
     startFunctionCB.addActionListener(new ActionListener() {
@@ -220,14 +237,16 @@ public class VibraStringWindow extends JFrame {
                 Double.parseDouble(speedT.getText().trim()),
                 (IMathFunction) startFunctionCB.getSelectedItem(),
                 (IMathFunction) secondFunctionCB.getSelectedItem(),
-                Double.parseDouble(precisionT.getText().trim()),
                 Double.parseDouble(timePrecisionT.getText().trim()),
-                Integer.parseInt(harmonicCompT.getText().trim()));
+                Integer.parseInt(harmonicCompT.getText().trim()),
+                Double.parseDouble(epsT.getText().trim()));
         vibraString.calcXGrid(
                 Double.parseDouble(stringLengthT.getText().trim()),
                 Double.parseDouble(precisionT.getText().trim()));
-        vibraString.calcYStart(vibraString.getF(), vibraString.getxGrid());
-        vibraStringP.setValues(vibraString.getxGrid(), vibraString.getyStart());
+
+        vibraStringP.setValues(vibraString.getxGrid(),
+                vibraString.calcYStart(
+                vibraString.getF(), vibraString.getxGrid()));
       }
     });
 
@@ -240,54 +259,60 @@ public class VibraStringWindow extends JFrame {
     harmonicCompT = new JTextField("10");
     decayT = new JTextField("0");
     tauT = new JTextField("20");
+    epsT = new JTextField("1E-4");
 
     JPanel fP = new JPanel(new BorderLayout());
     fP.add(startFunctionL, BorderLayout.NORTH);
     fP.add(startFunctionCB, BorderLayout.CENTER);
-    centerP.add(fP);
+    rightP.add(fP);
 
     JPanel gP = new JPanel(new BorderLayout());
     gP.add(secondFunctionL, BorderLayout.NORTH);
     gP.add(secondFunctionCB, BorderLayout.CENTER);
-    centerP.add(gP);
+    rightP.add(gP);
 
     JPanel stringLengthP = new JPanel(new BorderLayout());
     stringLengthP.add(stringLengthL, BorderLayout.NORTH);
     stringLengthP.add(stringLengthT, BorderLayout.CENTER);
-    centerP.add(stringLengthP);
+    //rightP.add(stringLengthP);
 
     JPanel speedP = new JPanel(new BorderLayout());
     speedP.add(speedL, BorderLayout.NORTH);
     speedP.add(speedT, BorderLayout.CENTER);
-    centerP.add(speedP);
+    rightP.add(speedP);
 
     JPanel precisionP = new JPanel(new BorderLayout());
     precisionP.add(precisionL, BorderLayout.NORTH);
     precisionP.add(precisionT, BorderLayout.CENTER);
-    centerP.add(precisionP);
+    rightP.add(precisionP);
 
     JPanel timePrecisionP = new JPanel(new BorderLayout());
     timePrecisionP.add(timePrecisionL, BorderLayout.NORTH);
     timePrecisionP.add(timePrecisionT, BorderLayout.CENTER);
-    centerP.add(timePrecisionP);
+    rightP.add(timePrecisionP);
 
     JPanel harmonicCompP = new JPanel(new BorderLayout());
     harmonicCompP.add(harmonicCompL, BorderLayout.NORTH);
     harmonicCompP.add(harmonicCompT, BorderLayout.CENTER);
-    centerP.add(harmonicCompP);
+    rightP.add(harmonicCompP);
 
     JPanel decayP = new JPanel(new BorderLayout());
     decayP.add(decayL, BorderLayout.NORTH);
     decayP.add(decayT, BorderLayout.CENTER);
-    centerP.add(decayP);
+    rightP.add(decayP);
 
     JPanel tauP = new JPanel(new BorderLayout());
     tauP.add(tauL, BorderLayout.NORTH);
     tauP.add(tauT, BorderLayout.CENTER);
-    centerP.add(tauP);
+    rightP.add(tauP);
+
+    JPanel epsP = new JPanel(new BorderLayout());
+    epsP.add(epsL, BorderLayout.NORTH);
+    epsP.add(epsT, BorderLayout.CENTER);
+    rightP.add(epsP);
 
     settingsP.add(leftP, BorderLayout.WEST);
-    settingsP.add(centerP, BorderLayout.CENTER);
+    settingsP.add(rightP, BorderLayout.CENTER);
 
     contentPane.add(settingsP, BorderLayout.NORTH);
   }
@@ -304,59 +329,104 @@ public class VibraStringWindow extends JFrame {
 
       @Override
       public void actionPerformed(ActionEvent e) {
-        JButton btn = (JButton) e.getSource();
+        final JButton btn = (JButton) e.getSource();
 
         if (btn.getText().equals(startS)) {
+          btn.setText(stopS);
+          startFunctionCB.setEnabled(false);
+          secondFunctionCB.setEnabled(false);
+          stringLengthT.setEditable(false);
+          speedT.setEditable(false);
+          precisionT.setEditable(false);
+          timePrecisionT.setEditable(false);
+          harmonicCompT.setEditable(false);
+          decayT.setEditable(false);
+          tauT.setEditable(false);
+          epsT.setEditable(false);
+
+
           try {
-            vibraString.setLength(
-                    Double.parseDouble(stringLengthT.getText().trim()));
-            vibraString.setC(
-                    Double.parseDouble(speedT.getText().trim()));
             vibraString.setF(
                     (IMathFunction) startFunctionCB.getSelectedItem());
             vibraString.setG(
                     (IMathFunction) secondFunctionCB.getSelectedItem());
+            vibraString.setLength(
+                    Double.parseDouble(stringLengthT.getText().trim()));
+            vibraString.setC(
+                    Double.parseDouble(speedT.getText().trim()));
             vibraString.setTimePrec(
                     Double.parseDouble(timePrecisionT.getText().trim()));
             vibraString.setHarmonicComp(
                     Integer.parseInt(harmonicCompT.getText().trim()));
+            vibraString.setEps(Double.parseDouble(epsT.getText().trim()));
+
             vibraString.calcXGrid(
                     Double.parseDouble(stringLengthT.getText().trim()),
                     Double.parseDouble(precisionT.getText().trim()));
             vibraString.calcYStart(vibraString.getF(), vibraString.getxGrid());
 
-            new Thread(progressBar).start();
+            progressBarThread = new Thread(progressBar);
+            progressBarThread.start();
 
-            vibraString.calcStringMovement();
-
-            vibraString.resetYt();
             calculatorThread = new CalculatorThread(vibraString.getxGrid(),
                     vibraString.getyStart(),
                     Double.parseDouble(tauT.getText().trim()),
                     Integer.parseInt(decayT.getText().trim()));
             graphUpdaterThread = new GraphUpdaterThread(
                     vibraString.getyStart());
-            //soundThread = new SoundThread(vibraString.getyStart());
-            calculatorThread.start();
-            graphUpdaterThread.start();
-            //soundThread.start();
 
-            btn.setText(stopS);
+            //soundThread = new SoundThread(vibraString.getyStart());
+
+            controlThread = new Thread() {
+
+              @Override
+              public void run() {
+                vibraString.calcStringMovement();
+                vibraString.resetYt();
+
+                if (calculatorThread != null) {
+                  calculatorThread.start();
+                }
+
+                if (graphUpdaterThread != null) {
+                  graphUpdaterThread.start();
+                }
+
+                //soundThread.start();     
+
+              }
+            };
+            controlThread.start();
 
           } catch (Exception ex) {
             new JOptionPane("Form data invalid",
                     JOptionPane.ERROR_MESSAGE).setVisible(true);
           }
         } else {
+          btn.setText(startS);
+          startFunctionCB.setEnabled(true);
+          secondFunctionCB.setEnabled(true);
+          stringLengthT.setEditable(true);
+          speedT.setEditable(true);
+          precisionT.setEditable(true);
+          timePrecisionT.setEditable(true);
+          harmonicCompT.setEditable(true);
+          decayT.setEditable(true);
+          tauT.setEditable(true);
+          epsT.setEditable(true);
+
           calculatorThread.interrupt();
           calculatorThread = null;
           graphUpdaterThread.interrupt();
           graphUpdaterThread = null;
           //soundThread.interrupt();
           //soundThread = null;
-          progressBar.setValue(0);
+          progressBarThread.interrupt();
+          progressBarThread = null;
+          controlThread.interrupt();
+          controlThread = null;
 
-          btn.setText(startS);
+          progressBar.setValue(0);
         }
       }
     });
@@ -488,6 +558,31 @@ public class VibraStringWindow extends JFrame {
             y.notify();
           }
         }
+      }
+    }
+  }
+
+  /**
+   * The progress bar which shows the progress of the calculation
+   */
+  private class VibraStringProgressBar extends JProgressBar
+          implements Runnable {
+
+    /**
+     * Creates a new instance of {@code VibraString}
+     * @param min the min value
+     * @param max the max value
+     */
+    VibraStringProgressBar(int min, int max) {
+      super(min, max);
+    }
+
+    @Override
+    public void run() {
+      while (progressBarThread != null /*&& vibraString.getCurrentSlice() < vibraString.getSlices()*/) {
+//        progressBar.setValue((100 / vibraString.getSlices())
+//                * vibraString.getCurrentSlice() + 1);
+        progressBar.setValue(vibraString.getCurrentSlice() + 1);
       }
     }
   }

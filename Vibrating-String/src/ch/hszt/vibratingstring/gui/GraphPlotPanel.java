@@ -63,6 +63,13 @@ public class GraphPlotPanel extends JPanel {
     Graphics2D g2 = (Graphics2D) g;
     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
             RenderingHints.VALUE_ANTIALIAS_ON);
+    g2.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION,
+            RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
+    g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+            RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+    g2.setRenderingHint(RenderingHints.KEY_RENDERING,
+            RenderingHints.VALUE_RENDER_QUALITY);
+    g2.setPaint(Color.blue);
 
     double[] newXExtremals = getExtremals(x);
     double[] newYExtremals = getExtremals(y);
@@ -86,7 +93,7 @@ public class GraphPlotPanel extends JPanel {
     int w = getWidth();
     int h = getHeight();
     // space between abscissa values calulated with the panel width
-    double xScale = (w - 2 * PAD) / (xMax - xMin);
+    double xScale = (w - 2 * PAD) / xMax;//(xMax - xMin);
     // space between ordinate values calculated with the panel height
     double yScale = (h - 2 * PAD) / (yMax - yMin);
 
@@ -96,8 +103,6 @@ public class GraphPlotPanel extends JPanel {
     g2.draw(new Line2D.Double(PAD, PAD, PAD, h - PAD));
 
     // Connect the data points with lines
-    g2.setPaint(Color.blue);
-
     for (int i = 0; i < x.length - 1; i++) {
       double x1 = (PAD + (xScale * x[i]));
       double y1 = ((h - PAD) / 2) - (yScale * y[i]);
@@ -162,7 +167,7 @@ public class GraphPlotPanel extends JPanel {
    * Sets the maximum x-value
    * @param xMax the maximum x-value to set
    */
-  public void setxMax(Double xMax) {
+  private void setxMax(Double xMax) {
     this.xMax = xMax;
   }
 
@@ -177,14 +182,14 @@ public class GraphPlotPanel extends JPanel {
    * Sets the minimum x-value
    * @param xMin the minimum x-value to set
    */
-  public void setxMin(Double xMin) {
+  private void setxMin(Double xMin) {
     this.xMin = xMin;
   }
 
   /**
    * @return the minimum x-value
    */
-  public Double getxMin() {
+  private Double getxMin() {
     return xMin;
   }
 
@@ -192,14 +197,14 @@ public class GraphPlotPanel extends JPanel {
    * Sets the maximum y-value
    * @param yMax the maximum y-value to set
    */
-  public void setyMax(Double yMax) {
+  private void setyMax(Double yMax) {
     this.yMax = yMax;
   }
 
   /**
    * @return the maximum y-value
    */
-  public Double getyMax() {
+  private Double getyMax() {
     return yMax;
   }
 
@@ -207,14 +212,14 @@ public class GraphPlotPanel extends JPanel {
    * Sets the minimum y-value
    * @param yMin the minimum y-value to set
    */
-  public void setyMin(Double yMin) {
+  private void setyMin(Double yMin) {
     this.yMin = yMin;
   }
 
   /**
    * @return the minimum y-value
    */
-  public Double getyMin() {
+  private Double getyMin() {
     return yMin;
   }
 }

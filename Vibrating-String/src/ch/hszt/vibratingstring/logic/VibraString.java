@@ -38,7 +38,7 @@ public class VibraString {
    * The precision, when the integration method 
    * should return the result
    */
-  private final double EPSILON = 1E-4;
+  private double eps;
   /**
    * The grid of x-values used to calculate the y-values
    */
@@ -70,6 +70,10 @@ public class VibraString {
    * to have the values accessible for another plot
    */
   private double[][] ytStart;
+  /**
+   * The slice currently calculated
+   */
+  private int currentSlice = 0;
 
   /**
    * Creates a new instance of {@code VibraString}
@@ -77,23 +81,24 @@ public class VibraString {
    * @param speed the speed
    * @param f the initial function
    * @param g the second function
-   * @param precision the precision
    * @param timePrec the time precision
-   * @param harmonicComp the harmonic component 
+   * @param harmonicComp the harmonic component
+   * @param eps the precision for the integration 
    */
   public VibraString(double length,
           double speed,
           IMathFunction f,
           IMathFunction g,
-          double precision,
           double timePrec,
-          int harmonicComp) {
+          int harmonicComp,
+          double eps) {
     this.length = length;
     this.speed = speed;
     this.f = f;
     this.g = g;
     this.timePrec = timePrec;
     this.harmonicComp = harmonicComp;
+    this.eps = eps;
     calcSlices();
   }
 
@@ -149,25 +154,50 @@ public class VibraString {
             + 4 * f.calcBn(d, n, length)
             + 2 * f.calcBn(c, n, length)
             + 4 * f.calcBn(e, n, length) + f.calcBn(b, n, length));
-    if (Math.abs(Q2 - Q1) <= EPSILON) {
+    if (Math.abs(Q2 - Q1) <= eps) {
       return Q2 + (Q2 - Q1) / 15;
     }
     return fourierCoeff(n, a, c, f) + fourierCoeff(n, c, b, f);
   }
 
+  /**
+   * Implementation of the adaptive recursive simpson algorithm
+   * @param n the nth iteration
+   * @param f the function to integrate
+   * @param a the first value
+   * @param b the last value
+   * @param eps the precision of the result
+   * @param maxRecursionDepth the maximal recursion depth
+   * @return 
+   */
   public double adaptiveSimpsons(double n, IMathFunction f,
           double a, double b,
-          double epsilon,
+          double eps,
           int maxRecursionDepth) {
     double c = (a + b) / 2, h = b - a;
     double fa = f.calcBn(a, n, length);
     double fb = f.calcBn(b, n, length);
     double fc = f.calcBn(c, n, length);
     double S = (h / 6) * (fa + 4 * fc + fb);
-    return adaptiveSimpsonsAux(n, f, a, b, epsilon, S, fa, fb, fc, maxRecursionDepth);
+    return adaptiveSimpsonsAux(n, f, a, b, eps, S, fa, fb, fc, maxRecursionDepth);
   }
 
-  private double adaptiveSimpsonsAux(double n, IMathFunction f, double a, double b, double epsilon,
+  /**
+   * 
+   * @param n the nth iteration
+   * @param f the function to integrate
+   * @param a the first value
+   * @param b the last value
+   * @param eps the precision of the result
+   * @param S the simpson result
+   * @param fa f(a)
+   * @param fb f(b)
+   * @param fc f(c)
+   * @param bottom the bottom of the recursions
+   * @return 
+   */
+  private double adaptiveSimpsonsAux(double n,
+          IMathFunction f, double a, double b, double eps,
           double S, double fa, double fb, double fc, int bottom) {
     double c = (a + b) / 2, h = b - a;
     double d = (a + c) / 2, e = (c + b) / 2;
@@ -175,11 +205,13 @@ public class VibraString {
     double Sleft = (h / 12) * (fa + 4 * fd + fc);
     double Sright = (h / 12) * (fc + 4 * fe + fb);
     double S2 = Sleft + Sright;
-    if (bottom <= 0 || Math.abs(S2 - S) <= 15 * epsilon) {
+    if (bottom <= 0 || Math.abs(S2 - S) <= 15 * eps) {
       return S2 + (S2 - S) / 15;
     }
-    return adaptiveSimpsonsAux(n, f, a, c, epsilon / 2, Sleft, fa, fc, fd, bottom - 1)
-            + adaptiveSimpsonsAux(n, f, c, b, epsilon / 2, Sright, fc, fb, fe, bottom - 1);
+    return adaptiveSimpsonsAux(
+            n, f, a, c, eps / 2, Sleft, fa, fc, fd, bottom - 1)
+            + adaptiveSimpsonsAux(
+            n, f, c, b, eps / 2, Sright, fc, fb, fe, bottom - 1);
   }
 
   /**
@@ -193,24 +225,22 @@ public class VibraString {
     for (int i = 0; i < yStart.length; i++) {
       yt[0][i] = yStart[i];
     }
-   
+
     for (int t = 1; t < slices; t++) {
-      for (int i = 0; i < yStart.length; i++) {             
+      currentSlice = t;
+      for (int i = 0; i < yStart.length; i++) {
         for (int n = 1; n < harmonicComp; n++) {
           yt[t][i] += ((2 / length)
-                  * adaptiveSimpsons(n, f, xGrid[0], xGrid[xGrid.length - 1], EPSILON, 100)
+                  //* fourierCoeff(n, xGrid[0], xGrid[xGrid.length-1], f)
+                  * adaptiveSimpsons(
+                  n, f, xGrid[0], xGrid[xGrid.length - 1], eps, 1000)
                   * Math.cos(speed * n * Math.PI * (t * timePrec) / length)
                   + (2 / (speed * n * Math.PI))
-                  * adaptiveSimpsons(n, g, xGrid[0], xGrid[xGrid.length - 1], EPSILON, 100)
+                  //* fourierCoeff(n, xGrid[0], xGrid[xGrid.length-1], g)
+                  * adaptiveSimpsons(
+                  n, g, xGrid[0], xGrid[xGrid.length - 1], eps, 1000)
                   * Math.sin(speed * n * Math.PI * (t * timePrec) / length))
                   * Math.sin(n * Math.PI * xGrid[i] / length);
-//          yt[t][i] += ((2 / length)
-//                  * fourierCoeff(n, xGrid[0], xGrid[xGrid.length - 1], f)
-//                  * Math.cos(speed * n * Math.PI * (t * timePrec) / length)
-//                  + (2 / (speed * n * Math.PI))
-//                  * fourierCoeff(n, xGrid[0], xGrid[xGrid.length - 1], g)
-//                  * Math.sin(speed * n * Math.PI * (t * timePrec) / length))
-//                  * Math.sin(n * Math.PI * xGrid[i] / length);
         }
       }
     }
@@ -349,5 +379,20 @@ public class VibraString {
    */
   public void resetYt() {
     this.yt = ytStart;
+  }
+
+  /**
+   * @return the current slice calculated
+   */
+  public int getCurrentSlice() {
+    return currentSlice;
+  }
+
+  /**
+   * Sets the integration precision
+   * @param eps the precision to set
+   */
+  public void setEps(double eps) {
+    this.eps = eps;
   }
 }
