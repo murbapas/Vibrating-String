@@ -71,31 +71,31 @@ public class GraphPlotPanel extends JPanel {
             RenderingHints.VALUE_RENDER_QUALITY);
     g2.setPaint(Color.blue);
 
-    double[] newXExtremals = getExtremals(x);
-    double[] newYExtremals = getExtremals(y);
-
-    if (xMin > newXExtremals[0]) {
-      setxMin(newXExtremals[0]);
-    }
-
-    if (xMax < newXExtremals[1]) {
-      setxMax(newXExtremals[1]);
-    }
-
-    if (yMin > newYExtremals[0]) {
-      setyMin(newYExtremals[0]);
-    }
-
-    if (yMax < newYExtremals[1]) {
-      setyMax(newYExtremals[1]);
-    }
+//    double[] newXExtremals = getExtremals(x);
+//    double[] newYExtremals = getExtremals(y);
+//
+//    if (xMin > newXExtremals[0]) {
+//      setxMin(newXExtremals[0]);
+//    }
+//
+//    if (xMax < newXExtremals[1]) {
+//      setxMax(newXExtremals[1]);
+//    }
+//
+//    if (yMin > newYExtremals[0]) {
+//      setyMin(newYExtremals[0]);
+//    }
+//
+//    if (yMax < newYExtremals[1]) {
+//      setyMax(newYExtremals[1]);
+//    }
 
     int w = getWidth();
     int h = getHeight();
     // space between abscissa values calulated with the panel width
     double xScale = (w - 2 * PAD) / xMax;//(xMax - xMin);
     // space between ordinate values calculated with the panel height
-    double yScale = (h - 2 * PAD) / (yMax - yMin);
+    double yScale = (h - 2 * PAD) / yMax;//(yMax - yMin);
 
     // Draw abcissa.
     g2.draw(new Line2D.Double(PAD, (h - PAD) / 2, w - PAD, (h - PAD) / 2));
@@ -117,7 +117,7 @@ public class GraphPlotPanel extends JPanel {
    * @param d the array of doubles to find the extremals
    * @return the extremal values of x and y
    */
-  private double[] getExtremals(double[] d) {
+  public double[] getExtremals(double[] d) {
     double max = -Integer.MAX_VALUE;
     double min = -max;
 
@@ -130,6 +130,21 @@ public class GraphPlotPanel extends JPanel {
       }
     }
     return new double[]{min, max};
+  }
+
+  /**
+   * Sets the extremal values
+   * @param x the x-values
+   * @param y the y-values
+   */
+  public void setExtremals(double[] x, double[] y) {
+    double[] xExtremals = getExtremals(x);
+    this.xMin = xExtremals[0];
+    this.xMax = xExtremals[1];
+
+    double[] yExtremals = getExtremals(y);
+    this.yMin = 2 * yExtremals[0];
+    this.yMax = 2 * yExtremals[1];
   }
 
   /**

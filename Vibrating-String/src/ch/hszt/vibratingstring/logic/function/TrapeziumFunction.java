@@ -3,7 +3,7 @@
  * 
  * @author Farhan Fayyaz / Pascal Murbach
  * 
- * Implementation of the calculation of the rectangle function
+ * Implementation of the calculation of the trapezium function
  */
 package ch.hszt.vibratingstring.logic.function;
 
@@ -12,7 +12,7 @@ package ch.hszt.vibratingstring.logic.function;
  *
  * @author Farhan Fayyaz / Pascal Murbach
  */
-public class RectangleFunction implements IMathFunction {
+public class TrapeziumFunction implements IMathFunction {
 
   /**
    * The y-values
@@ -32,10 +32,6 @@ public class RectangleFunction implements IMathFunction {
   }
 
   public double calc(double x, double length) {
-    double b = 2 * Math.PI / length;
-    if (x >= 0.0d || x <= length / 2) {
-      return Math.sin(b * x) / Math.abs(Math.sin(b * x));
-    }
     return 1.0d;
   }
 
@@ -45,6 +41,6 @@ public class RectangleFunction implements IMathFunction {
 
   @Override
   public String toString() {
-    return "Rectangle";
+    return "Trapezium";
   }
 }

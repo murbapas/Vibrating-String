@@ -11,8 +11,10 @@ import ch.hszt.vibratingstring.logic.VibraString;
 import ch.hszt.vibratingstring.logic.function.IMathFunction;
 import ch.hszt.vibratingstring.logic.function.RandomFunction;
 import ch.hszt.vibratingstring.logic.function.SawToothFunction;
+import ch.hszt.vibratingstring.logic.function.SawToothFunction2;
 import ch.hszt.vibratingstring.logic.function.SinFunction;
 import ch.hszt.vibratingstring.logic.function.SquareFunction;
+import ch.hszt.vibratingstring.logic.function.TrapeziumFunction;
 import ch.hszt.vibratingstring.logic.function.TriaFunction;
 import ch.hszt.vibratingstring.logic.function.ZeroFunction;
 import static java.awt.Toolkit.getDefaultToolkit;
@@ -148,7 +150,7 @@ public class VibraStringWindow extends JFrame {
     vibraString.calcXGrid(
             Double.parseDouble(stringLengthT.getText().trim()),
             Double.parseDouble(precisionT.getText().trim()));
-    
+
     vibraString.calcYStart(vibraString.getF(), vibraString.getxGrid());
     vibraStringP.setValues(vibraString.getxGrid(), vibraString.getyStart());
   }
@@ -208,12 +210,27 @@ public class VibraStringWindow extends JFrame {
     rightP.setLayout(new GridLayout(1, 1, 5, 0));
     rightP.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
 
-    IMathFunction[] functionList = {
+    IMathFunction[] startFunctionList = {
       new SquareFunction(),
       new TriaFunction(),
       new RandomFunction(),
       new SawToothFunction(),
+      new SawToothFunction2(),
       new SinFunction(),
+      //new RectangleFunction(),
+      new TrapeziumFunction(),
+      new ZeroFunction()
+    };
+
+    IMathFunction[] secondFunctionList = {
+      new SquareFunction(),
+      new TriaFunction(),
+      new RandomFunction(),
+      new SawToothFunction(),
+      new SawToothFunction2(),
+      new SinFunction(),
+      //new RectangleFunction(),
+      new TrapeziumFunction(),
       new ZeroFunction()
     };
 
@@ -228,18 +245,12 @@ public class VibraStringWindow extends JFrame {
     JLabel tauL = new JLabel("DecayPrec");
     JLabel epsL = new JLabel("Eps");
 
-    startFunctionCB = new JComboBox(functionList);
+    startFunctionCB = new JComboBox(startFunctionList);
     startFunctionCB.addActionListener(new ActionListener() {
 
       public void actionPerformed(ActionEvent e) {
-        vibraString = new VibraString(
-                Double.parseDouble(stringLengthT.getText().trim()),
-                Double.parseDouble(speedT.getText().trim()),
-                (IMathFunction) startFunctionCB.getSelectedItem(),
-                (IMathFunction) secondFunctionCB.getSelectedItem(),
-                Double.parseDouble(timePrecisionT.getText().trim()),
-                Integer.parseInt(harmonicCompT.getText().trim()),
-                Double.parseDouble(epsT.getText().trim()));
+        vibraString.setF((IMathFunction) startFunctionCB.getSelectedItem());
+
         vibraString.calcXGrid(
                 Double.parseDouble(stringLengthT.getText().trim()),
                 Double.parseDouble(precisionT.getText().trim()));
@@ -247,11 +258,19 @@ public class VibraStringWindow extends JFrame {
         vibraStringP.setValues(vibraString.getxGrid(),
                 vibraString.calcYStart(
                 vibraString.getF(), vibraString.getxGrid()));
+
+        vibraStringP.setExtremals(vibraString.getxGrid(), vibraString.getyStart());
       }
     });
 
-    secondFunctionCB = new JComboBox(functionList);
+    secondFunctionCB = new JComboBox(secondFunctionList);
     secondFunctionCB.setSelectedIndex(secondFunctionCB.getItemCount() - 1);
+    secondFunctionCB.addActionListener(new ActionListener() {
+
+      public void actionPerformed(ActionEvent e) {
+        vibraString.setG((IMathFunction) secondFunctionCB.getSelectedItem());
+      }
+    });
     stringLengthT = new JTextField("2");
     speedT = new JTextField("40");
     precisionT = new JTextField("0.1");
@@ -323,6 +342,7 @@ public class VibraStringWindow extends JFrame {
   private JButton createStartB() {
     final String startS = "Start";
     final String stopS = "Stop";
+    final String plotS = "Plot";
     JButton button = new JButton(startS);
 
     button.addActionListener(new ActionListener() {
@@ -364,6 +384,10 @@ public class VibraStringWindow extends JFrame {
                     Double.parseDouble(stringLengthT.getText().trim()),
                     Double.parseDouble(precisionT.getText().trim()));
             vibraString.calcYStart(vibraString.getF(), vibraString.getxGrid());
+            vibraStringP.setExtremals(vibraString.getxGrid(),
+                    vibraString.getyStart());
+
+            vibraString.disableCalcStringMovement(false);
 
             progressBarThread = new Thread(progressBar);
             progressBarThread.start();
@@ -384,16 +408,7 @@ public class VibraStringWindow extends JFrame {
                 vibraString.calcStringMovement();
                 vibraString.resetYt();
 
-                if (calculatorThread != null) {
-                  calculatorThread.start();
-                }
-
-                if (graphUpdaterThread != null) {
-                  graphUpdaterThread.start();
-                }
-
-                //soundThread.start();     
-
+                btn.setText(plotS);
               }
             };
             controlThread.start();
@@ -402,7 +417,7 @@ public class VibraStringWindow extends JFrame {
             new JOptionPane("Form data invalid",
                     JOptionPane.ERROR_MESSAGE).setVisible(true);
           }
-        } else {
+        } else if (btn.getText().equals(stopS)) {
           btn.setText(startS);
           startFunctionCB.setEnabled(true);
           secondFunctionCB.setEnabled(true);
@@ -414,6 +429,8 @@ public class VibraStringWindow extends JFrame {
           decayT.setEditable(true);
           tauT.setEditable(true);
           epsT.setEditable(true);
+
+          vibraString.disableCalcStringMovement(true);
 
           calculatorThread.interrupt();
           calculatorThread = null;
@@ -427,6 +444,19 @@ public class VibraStringWindow extends JFrame {
           controlThread = null;
 
           progressBar.setValue(0);
+        } else {
+          if (calculatorThread != null && !calculatorThread.isAlive()) {
+            calculatorThread.start();
+          }
+
+          if (graphUpdaterThread != null
+                  && !graphUpdaterThread.isAlive()) {
+            graphUpdaterThread.start();
+          }
+
+          //soundThread.start();  
+
+          btn.setText(stopS);
         }
       }
     });
@@ -579,7 +609,8 @@ public class VibraStringWindow extends JFrame {
 
     @Override
     public void run() {
-      while (progressBarThread != null /*&& vibraString.getCurrentSlice() < vibraString.getSlices()*/) {
+      while (progressBarThread != null) {
+        // TODO this does not work
 //        progressBar.setValue((100 / vibraString.getSlices())
 //                * vibraString.getCurrentSlice() + 1);
         progressBar.setValue(vibraString.getCurrentSlice() + 1);

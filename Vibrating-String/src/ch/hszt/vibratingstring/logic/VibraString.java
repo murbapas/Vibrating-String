@@ -74,6 +74,14 @@ public class VibraString {
    * The slice currently calculated
    */
   private int currentSlice = 0;
+  /**
+   * True if to stop the calculation of the
+   * string movement since this can be an 
+   * exhaustive process that keeps running
+   * even when the caller thread was stopped 
+   * already
+   */
+  private boolean disableCalcStringMovement;
 
   /**
    * Creates a new instance of {@code VibraString}
@@ -114,7 +122,8 @@ public class VibraString {
     double step = 0.0;
 
     for (int i = 0; i <= l; i++) {
-      x[i] = new BigDecimal(step).setScale(1, RoundingMode.HALF_EVEN).doubleValue();
+      x[i] = new BigDecimal(step).setScale(1,
+              RoundingMode.HALF_EVEN).doubleValue();
       step += precision;
     }
     this.xGrid = x;
@@ -179,7 +188,8 @@ public class VibraString {
     double fb = f.calcBn(b, n, length);
     double fc = f.calcBn(c, n, length);
     double S = (h / 6) * (fa + 4 * fc + fb);
-    return adaptiveSimpsonsAux(n, f, a, b, eps, S, fa, fb, fc, maxRecursionDepth);
+    return adaptiveSimpsonsAux(n, f, a, b, eps, S, fa, fb, fc,
+            maxRecursionDepth);
   }
 
   /**
@@ -226,28 +236,51 @@ public class VibraString {
       yt[0][i] = yStart[i];
     }
 
-    for (int t = 1; t < slices; t++) {
-      currentSlice = t;
-      for (int i = 0; i < yStart.length; i++) {
-        for (int n = 1; n < harmonicComp; n++) {
-          yt[t][i] += ((2 / length)
-                  //* fourierCoeff(n, xGrid[0], xGrid[xGrid.length-1], f)
-                  * adaptiveSimpsons(
-                  n, f, xGrid[0], xGrid[xGrid.length - 1], eps, 1000)
-                  * Math.cos(speed * n * Math.PI * (t * timePrec) / length)
-                  + (2 / (speed * n * Math.PI))
-                  //* fourierCoeff(n, xGrid[0], xGrid[xGrid.length-1], g)
-                  * adaptiveSimpsons(
-                  n, g, xGrid[0], xGrid[xGrid.length - 1], eps, 1000)
-                  * Math.sin(speed * n * Math.PI * (t * timePrec) / length))
-                  * Math.sin(n * Math.PI * xGrid[i] / length);
+
+    start:
+      for (int t = 1; t < slices; t++) {
+        currentSlice = t;
+        for (int i = 0; i < yStart.length; i++) {
+          for (int n = 1; n < harmonicComp; n++) {
+
+            if (disableCalcStringMovement) {
+              break start;
+            }
+
+            // IMPORTANT: calculate also the values for the second function 
+            g.calc(xGrid, length);
+
+            yt[t][i] += ((2 / length)
+                    //* fourierCoeff(n, xGrid[0], xGrid[xGrid.length-1], f)
+                    * adaptiveSimpsons(
+                    n, f, xGrid[0], xGrid[xGrid.length - 1], eps, 1000)
+                    * Math.cos(speed * n * Math.PI * (t * timePrec) / length)
+                    + (2 / (speed * n * Math.PI))
+                    //* fourierCoeff(n, xGrid[0], xGrid[xGrid.length-1], g)
+                    * adaptiveSimpsons(
+                    n, g, xGrid[0], xGrid[xGrid.length - 1], eps, 1000)
+                    * Math.sin(speed * n * Math.PI * (t * timePrec) / length))
+                    * Math.sin(n * Math.PI * xGrid[i] / length);
+
+          }
         }
       }
-    }
 
     ytStart = yt;
 
     return yt;
+  }
+
+  /**
+   * Enables the stop flag in order
+   * to stop the calculation of the
+   * string movement
+   * 
+   * @param enabled enabled if calculation 
+   *        of string movement should be stopped
+   */
+  public synchronized void disableCalcStringMovement(boolean enabled) {
+    disableCalcStringMovement = enabled;
   }
 
   /**

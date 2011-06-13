@@ -12,7 +12,7 @@ package ch.hszt.vibratingstring.logic.function;
  * 
  * @author Pascal Murbach / Farhan Fayyaz
  */
-public class SawToothFunction implements IMathFunction {
+public class SawToothFunction2 implements IMathFunction {
 
   public double[] calc(double[] x, double length) {
 
@@ -26,7 +26,7 @@ public class SawToothFunction implements IMathFunction {
   }
 
   public double calc(double x, double length) {
-    return 0.5 * Math.asin(Math.sin(2 * Math.PI / length * x));
+    return 0.5 * Math.asin(Math.sin(5 * Math.PI / length * x));
   }
 
   public double calcBn(double x, double n, double length) {
@@ -35,6 +35,6 @@ public class SawToothFunction implements IMathFunction {
 
   @Override
   public String toString() {
-    return "Sawtooth";
+    return "Sawtooth 2";
   }
 }
