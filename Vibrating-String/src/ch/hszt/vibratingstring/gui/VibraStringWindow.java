@@ -352,9 +352,9 @@ public class VibraStringWindow extends JFrame {
         final JButton btn = (JButton) e.getSource();
 
         if (btn.getText().equals(startS)) {
-          
+
           btn.setText(stopS);
-          
+
           startFunctionCB.setEnabled(false);
           secondFunctionCB.setEnabled(false);
           stringLengthT.setEditable(false);
@@ -409,10 +409,10 @@ public class VibraStringWindow extends JFrame {
               public void run() {
                 vibraString.calcStringMovement();
                 vibraString.resetYt();
-                
+
                 if (controlThread != null) {
                   btn.setText(plotS);
-                }                
+                }
               }
             };
             controlThread.start();
