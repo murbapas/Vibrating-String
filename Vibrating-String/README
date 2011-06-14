@@ -1,7 +1,7 @@
 START THE PROGRAM:
 
 On Windows: 
-	./Run.bat
+	Run.bat
 
 On Unix-likes: 
 	./Run.sh
