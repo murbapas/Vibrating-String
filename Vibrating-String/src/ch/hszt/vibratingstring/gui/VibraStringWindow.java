@@ -381,6 +381,7 @@ public class VibraStringWindow extends JFrame {
             vibraString.setHarmonicComp(
                     Integer.parseInt(harmonicCompT.getText().trim()));
             vibraString.setEps(Double.parseDouble(epsT.getText().trim()));
+            vibraString.calcSlices();
 
             vibraString.calcXGrid(
                     Double.parseDouble(stringLengthT.getText().trim()),

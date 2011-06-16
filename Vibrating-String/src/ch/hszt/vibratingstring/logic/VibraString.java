@@ -371,7 +371,7 @@ public class VibraString {
   /**
    * Set the slices
    */
-  private void calcSlices() {
+  public void calcSlices() {
     this.slices = (int) ((2 * length) / (speed * timePrec));
   }
 
