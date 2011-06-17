@@ -242,7 +242,7 @@ public class VibraString {
         currentSlice = t;
         for (int i = 0; i < yStart.length; i++) {
           for (int n = 1; n < harmonicComp; n++) {
-
+            //System.out.println("");
             if (disableCalcStringMovement) {
               break start;
             }

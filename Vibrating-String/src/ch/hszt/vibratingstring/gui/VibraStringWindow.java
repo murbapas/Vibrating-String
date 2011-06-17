@@ -450,6 +450,8 @@ public class VibraStringWindow extends JFrame {
 
           progressBar.setValue(0);
         } else {
+          btn.setText(stopS);
+
           if (calculatorThread != null && !calculatorThread.isAlive()) {
             calculatorThread.start();
           }
@@ -459,9 +461,7 @@ public class VibraStringWindow extends JFrame {
             graphUpdaterThread.start();
           }
 
-          //soundThread.start();  
-
-          btn.setText(stopS);
+          //soundThread.start();            
         }
       }
     });
@@ -619,6 +619,9 @@ public class VibraStringWindow extends JFrame {
 //        progressBar.setValue((100 / vibraString.getSlices())
 //                * vibraString.getCurrentSlice() + 1);
         progressBar.setValue(vibraString.getCurrentSlice() + 1);
+      }
+      if (progressBar.getValue() == progressBar.getMaximum()) {
+        startB.setText("Plot");
       }
     }
   }
